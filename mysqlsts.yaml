@@ -1,7 +1,7 @@
 #kubectl create secret generic mysql-root-pass --from-literal=password=pasmsQlaiems
 #kubectl create secret generic mysql-user-pass --from-literal=username=imos --from-literal=password=LQfKeWWxWD@..
 #kubectl create secret generic mysql-db-url --from-literal=database=kodekloud_db7
-
+#k
 #stslive.yaml  
 #Password: pasmsQlaiems
 apiVersion: v1
