@@ -80,8 +80,7 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: mysql-store
-      namespace: ai-ems-dev
-    spec:
+          spec:
       accessModes: 
         - ReadWriteOnce
       storageClassName: "manual"
