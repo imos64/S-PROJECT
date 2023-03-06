@@ -1,5 +1,5 @@
 #kubectl -n ai-ems-dev create secret generic mysql-root-pass --from-literal=password=pasmsQlaiems$*==.
-#kubectl -n ai-ems-dev create secret generic mysql-user-pass --from-literal=username=admin --from-literal=password=LQ^~fK%$eW)+WxWD@..
+#kubectl -n ai-ems-dev create secret generic mysql-user-pass --from-literal=username=admin --from-literal=password=LQ^~fK%$eW+WxWD@..
 #kubectl -n ai-ems-dev create secret generic mysql-db-url --from-literal=database=mysql
 
 apiVersion: v1
