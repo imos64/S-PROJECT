@@ -13,6 +13,21 @@ spec:
     app: mysql
 
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-read
+  labels:
+    app: mysql
+    readonly: "true"
+spec:
+  ports:
+  - name: mysql
+    port: 3306
+  selector:
+    app: mysql
+
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
