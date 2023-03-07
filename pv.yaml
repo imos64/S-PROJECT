@@ -57,5 +57,4 @@ spec:
   hostPath:
     path: /mysql3
 
-    
-
+###
