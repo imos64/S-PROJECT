@@ -40,4 +40,4 @@ spec:
   capacity:
     storage: 50Gi
   hostPath:
-    path: /mysql
+    path: /mysql2
