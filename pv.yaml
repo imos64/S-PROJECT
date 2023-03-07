@@ -10,7 +10,7 @@ spec:
   capacity:
     storage: 50Gi
   hostPath:
-    path: /mysql0
+    path: /mysql1
 
 ---
 apiVersion: v1
@@ -25,7 +25,7 @@ spec:
   capacity:
     storage: 50Gi
   hostPath:
-    path: /mysql1
+    path: /mysql2
     
 ---
 apiVersion: v1
@@ -41,3 +41,21 @@ spec:
     storage: 50Gi
   hostPath:
     path: /mysql2
+    
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql3
+  namespace: dev-ahyeha
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  capacity:
+    storage: 50Gi
+  hostPath:
+    path: /mysql3
+
+    
+
