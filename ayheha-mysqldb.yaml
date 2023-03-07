@@ -26,7 +26,7 @@ spec:
   replicas: 2
   template:
     metadata:
-      namespace: ai-ems-dev
+      namespace: dev-ahyeha
       labels:
         app: mysql
     spec:
@@ -73,7 +73,7 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: mysql-store
-      namespace: ai-ems-dev
+      namespace: dev-ahyeha
     spec:
       accessModes: 
         - ReadWriteOnce
