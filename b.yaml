@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: usermanagement-deployment
+  namespace: test-ahyeha
+spec:
+  selector:
+    matchLabels:
+      app: usermanagement
+  replicas: 1
+  template:
+    metadata:
+      namespace: test-ahyeha
+      labels:
+        app: usermanagement
+    spec:
+      containers:
+        - name: usermanagement
+          # enter the path to your image, be sure to include the correct region prefix
+          image: jed.ocir.io/axulzqeiw39c/usermanagement:_VERSION_
+          ports:
+            - containerPort: 5055
+          env:
+            - name: JAVA_OPTS
+              value: "-Dspring.profiles.active=prod,api-docs,no-liquibase -Ddb.port=3306 -Ddb.name=usermanagement_db -Ddb.user=root -Ddb.url=database -Ddb.password=password"
+      imagePullSecrets:
+        # enter the name of the secret you created
+        - name: ocirsecrettest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: usermanagement-service
+  namespace: test-ahyeha
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 5055
+  selector:
+    app: usermanagement
