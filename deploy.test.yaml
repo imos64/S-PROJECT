@@ -80,7 +80,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: mysql-db-usm-url
-                key: database      
+                key: databaseusm      
           - name: MYSQL_USER
             valueFrom:
               secretKeyRef:
