@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-usermanagement
+  namespace: dev-ahyeha
+spec:
+  selector:
+    matchLabels:
+      app: mysql-usermanagement
+  serviceName: "mysql-usermanagement"
+  replicas: 2
+  template:
+    metadata:
+      namespace: dev-ahyeha
+      labels:
+        app: mysql-usermanagement
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: usermanagement
+          # enter the path to your image, be sure to include the correct region prefix
+          image: jed.ocir.io/axulzqeiw39c/usermanagement:_VERSION_
+          ports:
+            - containerPort: 3306
+            volumeMounts:
+            - name: mysql-store
+              mountPath: /var/lib/mysql
+            readinessProbe:
+              tcpSocket:
+                port: 3306
+              initialDelaySeconds: 5
+              periodSeconds: 10
+            livenessProbe:
+              tcpSocket:
+                port: 3306
+              initialDelaySeconds: 15
+              periodSeconds: 20
+            env:
+              - name: MYSQL_ROOT_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                  name: mysql-root-pass
+                  key: password
+                  value: usermanagement_db
+              - name: MYSQL_DATABASE
+                valueFrom:
+                  secretKeyRef:
+                  name: mysql-db-url
+                  key: database
+              - name: MYSQL_USER
+                valueFrom:
+                  secretKeyRef:
+                  name: mysql-user-pass
+                  key: username
+              - name: MYSQL_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                  name: mysql-user-pass
+                  key: password
+      imagePullSecrets:
+        # enter the name of the secret you created
+        - name: ocirsecretdev
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: usermanagements-service
+  namespace: dev-ahyeha
+  labels:
+    app: usermanagement
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    app: usermanagement
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: usermanagements-ingress-path
+  namespace: dev-ahyeha
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  tls:
+    - hosts:
+        - "dev.ahyeha.com"
+      secretName: apps-tls
+  rules:
+    - host: "dev.ahyeha.com"
+      http:
+        paths:
+          - path: /usermanagements(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: usermanagements-service
+                port:
+                  number: 80
