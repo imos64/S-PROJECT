@@ -10,6 +10,7 @@ spec:
   replicas: 1
   template:
     metadata:
+      namespace: test-ahyeha
       labels:
         app: usermanagement
     spec:
@@ -21,7 +22,7 @@ spec:
             - containerPort: 5055
           env:
             - name: JAVA_OPTS
-              value: "-Dspring.profiles.active=prod,api-docs,no-liquibase -Ddb.port=3306 -Ddb.name=usermanagement_db -Ddb.user=admin -Ddb.url=10.10.20.38 -Ddb.password=3NL7z!T#0q#*g!&Q"
+              value: "-Dspring.profiles.active=prod,api-docs,no-liquibase -Ddb.port=3306 -Ddb.name=usermanagement_db -Ddb.user=root -Ddb.url=database -Ddb.password=password"
       imagePullSecrets:
         # enter the name of the secret you created
         - name: ocirsecrettest
