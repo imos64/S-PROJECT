@@ -63,7 +63,7 @@ spec:
     - host: "dev.ahyeha.com"
       http:
         paths:
-          - path: /usermanagement(/|$)(.*)
+          - path: /userm(/|$)(.*)
             pathType: Prefix
             backend:
               service:
