@@ -21,13 +21,15 @@ spec:
             - containerPort: 5055
           env:
             - name: MYSQL_ROOT_PASSWORD
-              value: "<set to the key 'password' in secret 'mysql-root-pass'> Optional: false"
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-root-pass
+                  key: password
             - name: MYSQL_DATABASE
-              value: "<set to the key 'database' in secret 'mysql-db-url'> Optional: false"
-            - name: MYSQL_USER:
-              value: "<set to the key 'username' in secret 'mysql-user-pass'> Optional: false"
-            - name: MYSQL_PASSWORD:
-              value: "<set to the key 'password' in secret 'mysql-user-pass'> Optional: false"   
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-db-usm-url
+                  key: database
       imagePullSecrets:
         # enter the name of the secret you created
         - name: ocirsecretdev
