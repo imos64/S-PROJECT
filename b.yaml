@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: usermanagement-deployment
-  namespace: test-ahyeha
 spec:
   selector:
     matchLabels:
