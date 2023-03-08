@@ -53,10 +53,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - "dev.ahyeha.com"
+        - "test.ahyeha.com"
       secretName: apps-tls
   rules:
-    - host: "dev.ahyeha.com"
+    - host: "test.ahyeha.com"
       http:
         paths:
           - path: /usermanagements(/|$)(.*)
