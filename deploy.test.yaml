@@ -1,68 +1,104 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
-  name: usermanagement-deployment
+  name: mysql
   namespace: test-ahyeha
+  labels:
+    app: mysql
 spec:
+  ports:
+  - port: 3306
+  clusterIP: None
   selector:
-    matchLabels:
-      app: usermanagement
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: usermanagement
-    spec:
-      containers:
-        - name: usermanagement
-          # enter the path to your image, be sure to include the correct region prefix
-          image: jed.ocir.io/axulzqeiw39c/usermanagement:latest
-          ports:
-            - containerPort: 5055
-          env:
-            - name: JAVA_OPTS
-              value: "-Dspring.profiles.active=prod,api-docs,no-liquibase -Ddb.name=usermanagement_db -Ddb.port=3306 -Ddb.url=10.10.20.249 -Ddb.user=admin -Ddb.password=2gXpMQ!k6%8E"
-      imagePullSecrets:
-        # enter the name of the secret you created
-        - name: ocirsecrettest
+    app: mysql
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: usermanagements-service
+  name: mysql-read
   namespace: test-ahyeha
+  labels:
+    app: mysql
+    readonly: "true"
 spec:
-  type: ClusterIP
   ports:
-    - port: 80
-      protocol: TCP
-      targetPort: 5055
+  - name: mysql
+    port: 3306
   selector:
-    app: usermanagement
+    app: mysql
 
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
-  name: usermanagements-ingress-path
+  name: mysql-set
   namespace: test-ahyeha
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
-  tls:
-    - hosts:
-        - "dev.ahyeha.com"
-      secretName: apps-tls
-  rules:
-    - host: "dev.ahyeha.com"
-      http:
-        paths:
-          - path: /usermanagements(/|$)(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: usermanagements-service
-                port:
-                  number: 80
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: "mysql"
+  replicas: 2
+  template:
+    metadata:
+      namespace: test-ahyeha
+      labels:
+        app: mysql
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mysql
+        image: mysql:latest
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql-store
+          mountPath: /var/lib/mysql
+        readinessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-root-pass
+                key: password
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: mysql-db-url
+                key: database
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: mysql-db-usm-url
+                key: database      
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: mysql-user-pass
+                key: username
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-user-pass
+                key: password
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-store
+      namespace: test-ahyeha
+    spec:
+      accessModes: 
+        - ReadWriteOnce
+      storageClassName: "manual"
+      resources:
+        requests:
+          storage: 5Gi
