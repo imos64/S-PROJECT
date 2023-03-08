@@ -18,6 +18,8 @@ kind: StatefulSet
 metadata:
   name: usermanagement-set
   namespace: dev-ahyeha
+  labels:
+    app: usermanagement
 spec:
   serviceName: "usermanagement-service"
   replicas: 2
@@ -32,12 +34,10 @@ spec:
     spec: 
       terminationGracePeriodSeconds: 1800
       containers:
-       - name: usermanagement
+      - name: usermanagement
         image: jed.ocir.io/axulzqeiw39c/usermanagement:_VERSION_  
         ports:
         - containerPort: 5055
-      imagePullSecrets: 
-       - name: ocirsecretdev  
         volumeMounts:
         - name: mysql-store
           mountPath: /var/lib/mysql
@@ -62,6 +62,8 @@ spec:
               secretKeyRef:
                 name: mysql-db-usm-url
                 key: database
+      imagePullSecrets: 
+       - name: ocirsecretdev
   volumeClaimTemplates:
   - metadata:
       name: mysql-store
