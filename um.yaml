@@ -1,32 +1,58 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql3
+  namespace: dev-ahyeha
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  capacity:
+    storage: 50Gi
+  hostPath:
+    path: /mysql3
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: dev-ahyeha
+  labels:
+    app: usermanagement
+  name: usermanagement-service
+spec:
+  clusterIP: None
+  ports:
+  - port: 80
+  selector:
+    app: usermanagement
+
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: mysql-usermanagement
+  name: usermanagement-set
   namespace: dev-ahyeha
+  labels:
+    app: usermanagement
 spec:
+  serviceName: "usermanagement-service"
+  replicas: 2
   selector:
     matchLabels:
-      app: mysql-usermanagement
-  serviceName: "mysql-usermanagement"
-  replicas: 2
+      app: usermanagement
   template:
     metadata:
       namespace: dev-ahyeha
       labels:
-        app: mysql-usermanagement
-    spec:
-      terminationGracePeriodSeconds: 10
+        app: usermanagement
+    spec: 
+      terminationGracePeriodSeconds: 1800
       containers:
-        - name: usermanagement
-          # enter the path to your image, be sure to include the correct region prefix
-          image: jed.ocir.io/axulzqeiw39c/usermanagement:_VERSION_
-      imagePullSecrets:    
-        - name: ocirsecretdev
-      containers:
-      - name: mysql
-        image: mysql:latest
+      - name: usermanagement
+        image: jed.ocir.io/axulzqeiw39c/usermanagement:_VERSION_  
         ports:
-        - containerPort: 3306
+        - containerPort: 5055
         volumeMounts:
         - name: mysql-store
           mountPath: /var/lib/mysql
@@ -39,7 +65,7 @@ spec:
           tcpSocket:
             port: 3306
           initialDelaySeconds: 15
-          periodSeconds: 20
+          periodSeconds: 20  
         env:
           - name: MYSQL_ROOT_PASSWORD
             valueFrom:
@@ -51,16 +77,8 @@ spec:
               secretKeyRef:
                 name: mysql-db-usm-url
                 key: database
-          - name: MYSQL_USER
-            valueFrom:
-              secretKeyRef:
-                name: mysql-user-pass
-                key: username
-          - name: MYSQL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: mysql-user-pass
-                key: password
+      imagePullSecrets: 
+       - name: ocirsecretdev
   volumeClaimTemplates:
   - metadata:
       name: mysql-store
@@ -71,28 +89,12 @@ spec:
       storageClassName: "manual"
       resources:
         requests:
-          storage: 5Gi                
-                                               
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: usermanagements-service
-  namespace: dev-ahyeha
-spec:
-  type: ClusterIP
-  ports:
-    - port: 80
-      protocol: TCP
-      targetPort: 5055
-  selector:
-    app: usermanagements
-
+          storage: 5Gi
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: usermanagements-ingress-path
+  name: usermanagement-ingress-path
   namespace: dev-ahyeha
   annotations:
     kubernetes.io/ingress.class: "nginx"
@@ -106,10 +108,10 @@ spec:
     - host: "dev.ahyeha.com"
       http:
         paths:
-          - path: /usermanagements(/|$)(.*)
+          - path: /userm(/|$)(.*)
             pathType: Prefix
             backend:
               service:
-                name: usermanagements-service
+                name: usermanagement-service
                 port:
                   number: 80
