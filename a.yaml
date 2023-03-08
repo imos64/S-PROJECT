@@ -22,7 +22,7 @@ spec:
             - containerPort: 5055
           env:
             - name: JAVA_OPTS
-              value: "-Dspring.profiles.active=prod,api-docs,no-liquibase -Ddb.port=3306 -Ddb.name=usermanagement_db -Ddb.user=root -Ddb.url=database -Ddb.password=password"
+              value: "-Dspring.profiles.active=prod,api-docs,no-liquibase -Ddb.port=3306 -Ddb.name=usermanagement_db -Ddb.user=root -Ddb.url=10.96.7.40 -Ddb.password=password"
       imagePullSecrets:
         # enter the name of the secret you created
         - name: ocirsecrettest
