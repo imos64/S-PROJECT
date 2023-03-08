@@ -1,79 +1,42 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
-  name: mysql-usermanagement
+  name: usermanagement-deployment
   namespace: dev-ahyeha
 spec:
   selector:
     matchLabels:
-      app: mysql-usermanagement
-  serviceName: "mysql-usermanagement"
-  replicas: 2
+      app: usermanagement
+  replicas: 1
   template:
     metadata:
-      namespace: dev-ahyeha
       labels:
-        app: mysql-usermanagement
+        app: usermanagement
     spec:
-      terminationGracePeriodSeconds: 10
       containers:
         - name: usermanagement
           # enter the path to your image, be sure to include the correct region prefix
           image: jed.ocir.io/axulzqeiw39c/usermanagement:_VERSION_
           ports:
-            - containerPort: 3306
-            volumeMounts:
-            - name: mysql-store
-              mountPath: /var/lib/mysql
-            readinessProbe:
-              tcpSocket:
-                port: 3306
-              initialDelaySeconds: 5
-              periodSeconds: 10
-            livenessProbe:
-              tcpSocket:
-                port: 3306
-              initialDelaySeconds: 15
-              periodSeconds: 20
-            env:
-              - name: MYSQL_ROOT_PASSWORD
-                valueFrom:
-                  secretKeyRef:
-                  name: mysql-root-pass
-                  key: password
-                  value: usermanagement_db
-              - name: MYSQL_DATABASE
-                valueFrom:
-                  secretKeyRef:
-                  name: mysql-db-url
-                  key: database
-              - name: MYSQL_USER
-                valueFrom:
-                  secretKeyRef:
-                  name: mysql-user-pass
-                  key: username
-              - name: MYSQL_PASSWORD
-                valueFrom:
-                  secretKeyRef:
-                  name: mysql-user-pass
-                  key: password
+            - containerPort: 5055
+          env:
+            - name: JAVA_OPTS
+              value: "-Dspring.profiles.active=prod,api-docs,no-liquibase -Ddb.name=usermanagement_db -Ddb.port=3306 -Ddb.url=database -Ddb.user=username -Ddb.password=password"
       imagePullSecrets:
         # enter the name of the secret you created
         - name: ocirsecretdev
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: usermanagements-service
   namespace: dev-ahyeha
-  labels:
-    app: usermanagement
 spec:
+  type: ClusterIP
   ports:
-  - port: 80
-    name: web
-  clusterIP: None
+    - port: 80
+      protocol: TCP
+      targetPort: 5055
   selector:
     app: usermanagement
 
