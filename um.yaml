@@ -34,7 +34,7 @@ spec:
     spec: 
       terminationGracePeriodSeconds: 1800
       containers:
-      - name: usermanagement
+       - name: usermanagement
         image: jed.ocir.io/axulzqeiw39c/usermanagement:_VERSION_  
         ports:
         - containerPort: 5055
