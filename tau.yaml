@@ -32,7 +32,7 @@ spec:
               key: password
               name: mysql-trs-pass
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:mysql://tau:$(mysql-trs-pass)@mysql-read/authentication_db?useUnicode=true&characterEncoding=utf8&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false      
+          value: jdbc:mysql://tau:$(MYSQL_PASSWORD)@mysql-read/authentication_db?useUnicode=true&characterEncoding=utf8&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false      
         image: jed.ocir.io/axulzqeiw39c/authentication:test
         imagePullPolicy: IfNotPresent
         name: authentication
