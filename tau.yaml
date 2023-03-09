@@ -29,8 +29,8 @@ spec:
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
-              key: password
-              name: mysql-tau-pass
+              key: 
+              name: 
         - name: SPRING_DATASOURCE_URL
           value: jdbc:mysql://tau:$(MYSQL_PASSWORD)@mysql-read/authentication_db?useUnicode=true&characterEncoding=utf8&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false      
         image: jed.ocir.io/axulzqeiw39c/authentication:test
