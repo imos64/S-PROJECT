@@ -25,7 +25,7 @@ spec:
       containers:   
       - env:
         - name: JAVA_OPTS
-          value: -Dspring.profiles.active=prod,api-docs,no-liquibase
+          value: jdbc:mysql://tau:$(MYSQL_PASSWORD)@mysql-read/authentication_db?useUnicode=true&characterEncoding=utf8&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
         - name: MYSQL_PASSWORD
           valueFrom:
             secretKeyRef:
